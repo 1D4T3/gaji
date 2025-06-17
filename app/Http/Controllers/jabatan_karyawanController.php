@@ -25,20 +25,49 @@ class jabatan_karyawanController extends Controller
     public function getjabatan_karyawan(Request $request)
 {
     if ($request->ajax()) {
-        $jabatan_karyawan = jabatan_karyawan::all();
-        return DataTables::of($jabatan_karyawan)
+        // DIUBAH: Gunakan with() untuk Eager Loading relasi
+        $data = jabatan_karyawan::with(['karyawan', 'lokasi']);
+
+        return DataTables::of($data)
+            ->addIndexColumn()
+            // DITAMBAHKAN: Kolom untuk menampilkan nama karyawan
+            ->addColumn('nama_karyawan', function ($jabatan_karyawan) {
+                // Gunakan optional() atau null safe operator (?->) agar tidak error jika relasi kosong
+                return $jabatan_karyawan->karyawan->nama_karyawan ?? 'N/A';
+            })
+            // DITAMBAHKAN: Kolom untuk menampilkan nama lokasi
+            ->addColumn('nama_lokasi', function ($jabatan_karyawan) {
+                return $jabatan_karyawan->lokasi->nama_lokasi ?? 'N/A';
+            })
             ->editColumn('aksi', function ($jabatan_karyawan) {
                 return view('partials._action', [
                     'model' => $jabatan_karyawan,
-                    'form_url' => route('jabatan_karyawan.destroy', $jabatan_karyawan->id),
-                    'edit_url' => route('jabatan_karyawan.edit', $jabatan_karyawan->id),
+                    'form_url' => route('bagian.destroy', $jabatan_karyawan->id),
+                    'edit_url' => route('bagian.edit', $jabatan_karyawan->id),
                 ]);
             })
-            ->addIndexColumn()
+            // DITAMBAHKAN: 'aksi' harus tetap di rawColumns jika mengandung HTML
             ->rawColumns(['aksi'])
             ->make(true);
     }
 }
+//     public function getjabatan_karyawan(Request $request)
+// {
+//     if ($request->ajax()) {
+//         $jabatan_karyawan = jabatan_karyawan::all();
+//         return DataTables::of($jabatan_karyawan)
+//             ->editColumn('aksi', function ($jabatan_karyawan) {
+//                 return view('partials._action', [
+//                     'model' => $jabatan_karyawan,
+//                     'form_url' => route('jabatan_karyawan.destroy', $jabatan_karyawan->id),
+//                     'edit_url' => route('jabatan_karyawan.edit', $jabatan_karyawan->id),
+//                 ]);
+//             })
+//             ->addIndexColumn()
+//             ->rawColumns(['aksi'])
+//             ->make(true);
+//     }
+// }
     /**
      * Show the form for creating a new resource.
      */

@@ -23,8 +23,21 @@ class bagian_karyawanController extends Controller
     public function getbagian_karyawan(Request $request)
 {
     if ($request->ajax()) {
-        $bagian_karyawan = bagian_karyawan::all();
-        return DataTables::of($bagian_karyawan)
+        if ($request->ajax()) {
+        // DIUBAH: Gunakan with() untuk Eager Loading relasi
+        $data = bagian_karyawan::with(['bagian', 'karyawan']);
+
+        return DataTables::of($data)
+            ->addIndexColumn()
+            // DITAMBAHKAN: Kolom untuk menampilkan nama karyawan
+            ->addColumn('nama_bagian', function ($bagian_karyawan) {
+                // Gunakan optional() atau null safe operator (?->) agar tidak error jika relasi kosong
+                return $bagian_karyawan->bagian->nama_bagian ?? 'N/A';
+            })
+            // DITAMBAHKAN: Kolom untuk menampilkan nama lokasi
+            ->addColumn('nama_karyawan', function ($bagian_karyawan) {
+                return $bagian_karyawan->karyawan->nama_karyawan ?? 'N/A';
+            })
             ->editColumn('aksi', function ($bagian_karyawan) {
                 return view('partials._action', [
                     'model' => $bagian_karyawan,
@@ -32,11 +45,29 @@ class bagian_karyawanController extends Controller
                     'edit_url' => route('bagian_karyawan.edit', $bagian_karyawan->id),
                 ]);
             })
-            ->addIndexColumn()
+            // DITAMBAHKAN: 'aksi' harus tetap di rawColumns jika mengandung HTML
             ->rawColumns(['aksi'])
             ->make(true);
     }
+    }
 }
+//     public function getbagian_karyawan(Request $request)
+// {
+//     if ($request->ajax()) {
+//         $bagian_karyawan = bagian_karyawan::all();
+//         return DataTables::of($bagian_karyawan)
+//             ->editColumn('aksi', function ($bagian_karyawan) {
+//                 return view('partials._action', [
+//                     'model' => $bagian_karyawan,
+//                     'form_url' => route('bagian_karyawan.destroy', $bagian_karyawan->id),
+//                     'edit_url' => route('bagian_karyawan.edit', $bagian_karyawan->id),
+//                 ]);
+//             })
+//             ->addIndexColumn()
+//             ->rawColumns(['aksi'])
+//             ->make(true);
+//     }
+// }
 
     /**
      * Show the form for creating a new resource.

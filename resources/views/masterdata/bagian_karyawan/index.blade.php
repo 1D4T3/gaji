@@ -60,12 +60,12 @@
                         searchable: false
                     },
                     {
-                        data: 'bagian_id',
-                        name: 'bagian_id'
+                        data: 'nama_bagian',
+                        name: 'bagian.nama_bagian',
                     },
                     {
-                        data: 'karyawan_id',
-                        name: 'karyawan_id'
+                        data: 'nama_karyawan',
+                        name: 'karyawan.nama_karyawan',
                     },
                     {
                         data: 'tanggal_mulai',

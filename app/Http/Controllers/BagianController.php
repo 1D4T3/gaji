@@ -22,11 +22,41 @@ class BagianController extends Controller
         return view('masterdata.bagian.index', ['bagian' => $bagian]);
     }
 
+//     public function getBagian(Request $request)
+// {
+//     if ($request->ajax()) {
+//         $bagian = Bagian::all();
+//         return DataTables::of($bagian)
+//             ->editColumn('aksi', function ($bagian) {
+//                 return view('partials._action', [
+//                     'model' => $bagian,
+//                     'form_url' => route('bagian.destroy', $bagian->id),
+//                     'edit_url' => route('bagian.edit', $bagian->id),
+//                 ]);
+//             })
+//             ->addIndexColumn()
+//             ->rawColumns(['aksi'])
+//             ->make(true);
+//     }
+// }
+
     public function getBagian(Request $request)
 {
     if ($request->ajax()) {
-        $bagian = Bagian::all();
-        return DataTables::of($bagian)
+        // DIUBAH: Gunakan with() untuk Eager Loading relasi
+        $data = Bagian::with(['karyawan', 'lokasi']);
+
+        return DataTables::of($data)
+            ->addIndexColumn()
+            // DITAMBAHKAN: Kolom untuk menampilkan nama karyawan
+            ->addColumn('nama_lengkap', function ($bagian) {
+                // Gunakan optional() atau null safe operator (?->) agar tidak error jika relasi kosong
+                return $bagian->karyawan->nama_lengkap ?? 'N/A';
+            })
+            // DITAMBAHKAN: Kolom untuk menampilkan nama lokasi
+            ->addColumn('nama_lokasi', function ($bagian) {
+                return $bagian->lokasi->nama_lokasi ?? 'N/A';
+            })
             ->editColumn('aksi', function ($bagian) {
                 return view('partials._action', [
                     'model' => $bagian,
@@ -34,12 +64,11 @@ class BagianController extends Controller
                     'edit_url' => route('bagian.edit', $bagian->id),
                 ]);
             })
-            ->addIndexColumn()
+            // DITAMBAHKAN: 'aksi' harus tetap di rawColumns jika mengandung HTML
             ->rawColumns(['aksi'])
             ->make(true);
     }
 }
-
     /**
      * Show the form for creating a new resource.
      */

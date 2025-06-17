@@ -64,12 +64,12 @@
                         name: 'nama_bagian'
                     },
                     {
-                        data: 'karyawan_id',
-                        name: 'karyawan_id'
+                        data: 'nama_lengkap',
+                        name: 'karyawan.nama_lengkap',
                     },
                     {
-                        data: 'lokasi_id',
-                        name: 'lokasi_id'
+                        data: 'nama_lokasi',
+                        name: 'lokasi.nama_lokasi',
                     },
                     {
                         data: 'aksi',
