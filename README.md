@@ -1,2 +1,0 @@
-# gaji
-PRAKTIKUM SEMESTER 8
